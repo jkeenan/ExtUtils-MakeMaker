@@ -144,6 +144,25 @@ sub pod2man {
     do {{  # so 'next' works
         my ($pod, $man) = splice(@ARGV, 0, 2);
 
+    # #####
+    # https://github.com/Perl/perl5/pull/24042#issuecomment-3694163505
+
+            my ($man_mtime, $pod_mtime, $makefile_mtime) =
+            (mtime($man), mtime($pod), mtime("Makefile"));
+
+        warn sprintf(
+            "DEBUG: man=%s mtime=%s, pod=%s mtime=%s, Makefile mtime=%s\n",
+            $man,
+            defined $man_mtime      ? $man_mtime      : 'undef',
+            $pod,
+            defined $pod_mtime      ? $pod_mtime      : 'undef',
+            defined $makefile_mtime ? $makefile_mtime : 'undef',
+        );
+
+        warn "DEBUG: pod file '$pod' does not exist\n"
+            if !-e $pod;
+    # #####
+
         next if ((-e $man) &&
                  (mtime($man) > mtime($pod)) &&
                  (mtime($man) > mtime("Makefile")));
